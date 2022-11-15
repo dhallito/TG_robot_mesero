@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block tittle %}
+    Inicio
+{% endblock %}
+
+{% block content %}
+    <h1>Inicio</h1>
+
+    <h2>Seleccione su mesa:</h2>
+
+    <form action="" method="POST">
+        <h3><label for="mesa">Mesa</label></h3>
+        <input type="radio" name="mesa" value='D' class="radio"> <h4>D</h4> <br/>
+        <input type="radio" name="mesa" value='E' class="radio"> <h4>E</h4> <br/>
+        <input type="radio" name="mesa" value='F' class="radio"> <h4>F</h4> <br/>
+        <input type="radio" name="mesa" value='G' class="radio"> <h4>G</h4> <br/>
+        <input type="radio" name="mesa" value='H' class="radio"> <h4>H</h4> <br/>
+
+        <input type="submit" value = "Seleccionar" />             
+    </form>
+{% endblock %}

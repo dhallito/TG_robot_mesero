@@ -1,0 +1,61 @@
+from queue import LifoQueue
+import numpy as np
+
+class A_Estrella:
+	def __init__(self, grafico):
+		self.grafico = grafico
+		self.llaves = list(self.grafico.keys())
+ 
+	def buscar_ruta(self, nodo_inicial, nodo_final, angulo_inicial, mejora):
+		rutas_exitosas = []
+		grafico = self.grafico
+		llaves = self.llaves
+		nodos_abiertos = LifoQueue()
+		nodos_abiertos.put({'nombre':nodo_inicial, 'ruta': [nodo_inicial],'ultimo_angulo': angulo_inicial, 'visitados':[nodo_inicial],'peso_acumulado':0})
+		while nodos_abiertos.empty() == False:
+			nodo = nodos_abiertos.get()
+			ultimo_angulo = nodo['ultimo_angulo']
+			peso_acumulado = nodo['peso_acumulado']
+			visitados = nodo['visitados'].copy()
+			nodos_siguientes = {}
+			for i in range(len(llaves)):
+				distancia = grafico[nodo['nombre']]['distancia'][i]
+				angulo = grafico[nodo['nombre']]['angulo'][i]
+				if distancia != None and not(llaves[i] in nodo['visitados']):
+					gn1 = distancia/1.28		#Dividido la distancia máxima
+					gn2 = np.abs(self.calcular_angulo(ultimo_angulo, angulo))/3.14	#Divido entre el ángulo máximo
+					gn = gn1*0.5 + gn2
+					hn = self.calcular_distancia_final(llaves[i], nodo_final,0)/4
+					fn = gn + hn
+					nodos_siguientes[llaves[i]]=[fn, gn, hn, angulo]
+			if nodo_final in nodos_siguientes:
+				ruta = nodo['ruta'].copy()
+				ruta.append(nodo_final)
+				rutas_exitosas.append({'ruta': ruta, 'peso_acumulado':peso_acumulado+nodos_siguientes[nodo_final][1]})
+				if not(mejora):
+					break
+			else:
+				sorted_nodos_siguientes = dict(sorted(nodos_siguientes.items(), key=lambda item:item[1], reverse=True))
+				for i in sorted_nodos_siguientes.keys():
+					ruta = nodo['ruta'].copy()
+					ruta.append(i)
+					visitados.append(i)
+					nodos_abiertos.put({'nombre':i, 'ruta': ruta,'ultimo_angulo': nodos_siguientes[i][3], 'visitados':visitados, 'peso_acumulado':peso_acumulado+nodos_siguientes[i][1]})
+		sorted_rutas_exitosas = sorted(rutas_exitosas, key=lambda item:(item['peso_acumulado']))
+		return sorted_rutas_exitosas[0]
+
+	def calcular_distancia_final(self, nodo, nodo_final, metodo):
+		grafico = self.grafico
+		if metodo == 0:
+			distancia = np.abs(grafico[nodo]['x']-grafico[nodo_final]['x']) + np.abs(grafico[nodo]['y']-grafico[nodo_final]['y'])
+		else:		
+			distancia = np.sqrt((grafico[nodo]['x']-grafico[nodo_final]['x'])**2 + (grafico[nodo]['y']-grafico[nodo_final]['y'])**2)
+		return distancia
+	
+	def calcular_angulo(self, ultimo_angulo, angulo):
+		if angulo-ultimo_angulo > 3.14:
+			return (angulo-ultimo_angulo)-6.28
+		elif angulo-ultimo_angulo < -3.14:
+			return 6.28 + (angulo-ultimo_angulo)
+		else:
+			return angulo-ultimo_angulo

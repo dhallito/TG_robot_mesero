@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block tittle %}
+    Mi Orden
+{% endblock %}
+
+{% block content %}
+    <h1>Mi Orden Mesa H</h1>
+    <br>
+    <table border="1">
+        <tr>
+            <th>Estado</th>
+            <th>Alimento</th>
+            <th>Bebida</th>
+        </tr>
+        {% for pedido in pedidos %}
+            <tr>
+                <td>
+                    {{pedido.0}}
+                </td>
+                <td>
+                    {{pedido.1.alimento}}
+                </td>
+                <td>
+                    {{pedido.1.bebida}}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+    
+    <form action="" method="POST">
+        <input type="submit" value = "Confirmar Recibido" />          
+    </form>
+
+{% endblock %}

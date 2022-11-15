@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block tittle %}
+    Orden
+{% endblock %}
+
+{% block content %}
+    <h1>Orden Mesa {{mesa}}</h1>
+    <h2>Elegir articulos</h2>
+    <form action="/ordenar_subir/{{mesa}}" method="POST">
+        <label for="alimento"><h4>Alimento</h4></label>
+        <select name="alimento">
+            {% for alimento in alimentos %}
+                <option value="{{alimento.1}}">{{alimento.1}}</option>
+            {% endfor %}
+        </select>
+
+        <label for="bebida"><h4>Bebida</h4></label>
+        <select name="bebida">
+            {% for bebida in bebidas %}
+                <option value="{{bebida.1}}">{{bebida.1}}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <br>
+        <input type="submit" value = "Agregar" />   
+    </form>
+    <br>
+    <hr>
+    <br>
+    <h2>Mi orden</h2>
+    <form action="" method="POST">
+        <input type="submit" value = "Ver" />             
+    </form>
+    
+{% endblock %}

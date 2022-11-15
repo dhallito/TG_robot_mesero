@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block tittle %}
+    Menu
+{% endblock %}
+
+{% block content %}
+    <h1>¡Bienvendos, Mesa {{mesa}}!</h1>
+    <h2>Menú</h2>
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+        </tr>
+        {% for producto in productos %}
+            <tr>
+                <td>
+                    {{producto.1}}
+                </td>
+                <td>
+                    ${{producto.2}}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <hr>
+    <h2>Realizar mi pedido</h2>
+    <form action="" method="POST">
+        <input type="submit" value = "Ir" />          
+    </form>
+{% endblock %}
