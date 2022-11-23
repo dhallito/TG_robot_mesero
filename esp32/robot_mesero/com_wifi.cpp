@@ -1,48 +1,37 @@
-/*#include "com_wifi.h"
-WiFiServer server(80);
-WiFiClient client = server.available();
+#include "com_wifi.h"
 
-void Com_Wifi::wifi_setup(){
-  WiFi.begin(ssid, pass);
+AsyncWebServer server(80);
+
+void setup_server(){
+  WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    // Parpadear un led
-    delay(500);
+    delay(1000);
+    Serial.println("Conectando a WiFi...");
   }
-  String LOCAL_IP = String(WiFi.localIP());
-  Serial.print("Conectando con IP: ");
   Serial.println(WiFi.localIP());
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    
+    int paramsNr = request->params();
+    if (paramsNr == 1){
+      String json = "{\"nodo_actual\": \"" + String(nodo_actual) + "\", \"angulo_absoluto\": \"" + String(angulo_absoluto) + "\"}"; 
+      request->send(200, "text/plain", json);
+    }else if(paramsNr == 3){
+      AsyncWebParameter* cantidad; 
+      cantidad = request->getParam(1);
+      ruta_size = (cantidad->value().toInt());
+      
+      AsyncWebParameter* recorrido;
+      recorrido = request->getParam(2);
+      for (int i = 0; i < ruta_size; i++) {
+        ruta[i] = recorrido->value()[i];
+      }
+      iniciando_robot = true;
+      nueva_ruta = true;
+      Serial.println("Nueva Ruta");
+      request->send(200, "text/plain", "ok");
+    } 
+  });
+ 
   server.begin();
 }
-
-void Com_Wifi::wifi_request(){
-  client = server.available();
-  if (client){
-    // Se indica que el cliente está haciendo un request
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();
-        if (c == '\n') {
-          wifi_interpretar(header);
-          header = "";
-        }
-        else if (c != '\r') {
-          header += c;
-        }
-      }
-    }
-    client.stop();
-  }
-}
-
-void Com_Wifi::wifi_interpretar(String header){
-  if (header.indexOf("LUZ_ON") != -1){
-    Serial.println("Luz Encendida");
-    digitalWrite(32, HIGH);
-    client.print("Luz ON");
-  }
-  else if (header.indexOf("LUZ_OFF") != -1){
-    Serial.println("Luz Apagada");
-    digitalWrite(32, LOW);
-    client.print("Luz OFF");
-  }
-}*/

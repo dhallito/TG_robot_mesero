@@ -6,6 +6,7 @@
 #include "seguimiento_linea.h"
 #include "motor.h"
 #include "lector_rfid.h"
+#include "com_wifi.h"
 
 int maquina_estados(int estado);
 

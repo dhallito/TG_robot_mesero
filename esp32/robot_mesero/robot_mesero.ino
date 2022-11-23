@@ -56,16 +56,7 @@ void setup() {
   /* GPIO Encoder B Interrupt */
   attachInterrupt(encoderB, isr_encoderB, RISING);
   
-  nueva_ruta = true;
-  ruta[0] = 'A';
-  ruta[1] = 'C';  
-  ruta[2] = 'D';
-  ruta[3] = 'C';
-  ruta[4] = 'B';
-  ruta[5] = 'E';
-  ruta[6] = 'B';
-  ruta_size = 7;
-  angulo_absoluto = 3.14;
+  angulo_absoluto = 0;
   nodo_actual = 'A';
   detener_motorA();
   detener_motorB();
@@ -110,13 +101,14 @@ void loop() {
       ck_motorB[0] = kp_motorB*ek_motorB[0]+ki_motorB*ek_motorB[1];
       controlar_motorB(ck_motorB[0]); 
     }else{
-      ledcWrite(canal1_pwm, 100);
-      ledcWrite(canal2_pwm, 100);
+      ledcWrite(canal1_pwm, 90);
+      ledcWrite(canal2_pwm, 90);
     }
-    
 //    Serial.print(angulo_relativo);
 //    Serial.print(',');
 //    Serial.print(distancia_relativa);
+//    Serial.print(" - A:");
+//    Serial.print(setpoint_rpm_motorA);
 //    Serial.print(',');
 //    Serial.print(ek_motorA[0]);
 //    Serial.print(',');
@@ -125,6 +117,8 @@ void loop() {
 //    Serial.print(distancia_ruedaA);
 //    Serial.print(',');
 //    Serial.print(rpm_motorA);
+//    Serial.print(" - B:");
+//    Serial.print(setpoint_rpm_motorB);
 //    Serial.print(',');
 //    Serial.print(ek_motorB[0]);
 //    Serial.print(',');

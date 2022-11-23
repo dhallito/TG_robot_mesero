@@ -6,8 +6,8 @@ long echo1_time = 0;
 long echo1_last = 0;
 
 /* Pines Sensor 1 */
-int trigger1_pin = 19;
-int echo1_pin = 18;
+int trigger1_pin = 15;
+int echo1_pin = 2;
 
 /* Timer0: Muestreo */
 bool muestreo_flag = false;
@@ -46,7 +46,7 @@ void setup() {
   /* Timer 3 setup: Muestreo */
   timer3 = timerBegin(3, 80, true);    /*80MHz/80 = 1MHz -> 1 us */
   timerAttachInterrupt(timer3, &onTimer3, true);
-  timerAlarmWrite(timer3, 100000, true);    /* Periodo de muestreo en us */
+  timerAlarmWrite(timer3, 500000, true);    /* Periodo de muestreo en us */
   timerAlarmEnable(timer3);
 
   /* GPIO echo 1 Interrupt */
@@ -62,20 +62,24 @@ void loop() {
   if (echo1_flag){
     echo1_flag = false;
     echo1_time = millis() - echo1_last;
-    Serial.print(millis());
-    Serial.print(",");
-    Serial.print(echo1_last);
-    Serial.print(",");
-    Serial.println(echo1_time);
+    if (echo1_time != 0){
+      Serial.print(millis());
+      Serial.print(",");
+      Serial.print(echo1_last);
+      Serial.print(",");
+      Serial.println(echo1_time); 
+    }
   }
   /* Pulso ultrasonico */
-  if (ultrasonic_pulse_flag){
+  else if (ultrasonic_pulse_flag){
     ultrasonic_pulse_flag = false;
     digitalWrite(trigger1_pin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigger1_pin, LOW);
     echo1_last = millis();
   }
+  
+  
   
   /* Envío de datos */
   if (muestreo_flag) {

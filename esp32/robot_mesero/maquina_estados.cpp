@@ -6,12 +6,19 @@ int maquina_estados(int estado){
   //Serial.println(estado);
   switch (estado) {
     case inicio:
+      setup_server();
       iniciar_IR();
       iniciar_motores();
       iniciar_rfid();
       state = operacion;
       break;
-    case operacion:      
+    case operacion:
+      if (iniciando_robot){
+        detener_motorA();
+        detener_motorB();
+        delay(3000);
+        iniciando_robot = false;   
+      }
       if (nueva_ruta) {
         state = calcular_nodo;
       }else if (nuevo_nodo){
@@ -33,11 +40,11 @@ int maquina_estados(int estado){
         nuevo_nodo = true;
         nueva_ruta = false;
         if (angulo_giro > 0){
-          adelante_motorA();
-          atras_motorB();
-        }else if (angulo_giro < 0){
-          atras_motorA();
           adelante_motorB();
+          atras_motorA();
+        }else if (angulo_giro < 0){
+          atras_motorB();
+          adelante_motorA();
         }else{
           nuevo_nodo = false;
           preparado = true;
@@ -50,11 +57,11 @@ int maquina_estados(int estado){
           adelante_motorA();
           adelante_motorB();
         }
-        delay(1000);
         setpoint_rpm_motorA = 40;
         setpoint_rpm_motorB = 40;
       }else{
-        //Finalicé ruta
+        nueva_ruta = false;
+        contador_ruta = 1;
       }
       state = operacion;
       break;
@@ -100,11 +107,11 @@ int maquina_estados(int estado){
         distancia_relativa = (distancia_ruedaB + distancia_ruedaA)/2;
         if (distancia_relativa < distancia_minima*0.9){
           leer_IR();
-          if (atrasIR_value[2] or atrasIR_value[3]){
-            atrasIR_value[5]=LOW;
-            atrasIR_value[0]=LOW;
+          if (adelanteIR_value[2] or adelanteIR_value[3]){
+            adelanteIR_value[5]=LOW;
+            adelanteIR_value[0]=LOW;
           }
-          error_linea = -3*atrasIR_value[0] - 2*atrasIR_value[1] - 4*atrasIR_value[2] + 4*atrasIR_value[3] + 2*atrasIR_value[4] + 3*atrasIR_value[5];
+          error_linea = -4*adelanteIR_value[0] - 3.5*adelanteIR_value[1] - 3*adelanteIR_value[2] - 0*atrasIR_value[1] + 0*atrasIR_value[0] + 3*adelanteIR_value[3] + 3.5*adelanteIR_value[4] + 4*adelanteIR_value[5];
           error_integral_linea = error_integral_linea + error_linea;
           correccion_linea = kp_linea*error_linea + ki_linea*error_integral_linea;
           setpoint_rpm_motorA = velocidad_base - correccion_linea;
@@ -121,22 +128,10 @@ int maquina_estados(int estado){
             detener_motorA();
             detener_motorB();
             controlando = true;
+            Serial.println(nodo_actual);
           }
         }
-      }
-
-
-    
-      if (millis() - last_time_linea > 100){
-        
-          
-      }
-      
-      if (millis() - last_time_prueba > 100 and distancia_relativa > distancia_minima*0.9){
-        last_time_prueba = millis();
-        
-      }
-
+      }      
 //        for (int i = 0; i < 6; i++) {
 //          Serial.print(atrasIR_value[i]);
 //        }
@@ -167,7 +162,6 @@ void calcular_nodo_actual(){
   switch(nodo_actual){
     case 'A':
       nodo_siguiente_angulos[2] = 1.57;
-
       nodo_siguiente_distancias[2] = 1.00;
       break;
     case 'B':

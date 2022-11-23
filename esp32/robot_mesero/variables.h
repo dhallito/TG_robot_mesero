@@ -17,8 +17,8 @@ extern int input4_pin;
 extern int encoderB;
 
 /* Pines IR */
-extern int atrasIR_pin[6];
-extern int adelanteIR_pin[2];
+extern int adelanteIR_pin[6];
+extern int atrasIR_pin[2];
 
 /* Pines Ultrasonido */
 extern int outputUS_pin;
@@ -43,7 +43,6 @@ extern float ck_motorA[5];
 extern float ki_motorA;
 extern float kp_motorA;
 extern bool controlando;
-
 
 extern unsigned long last_timeB;   /*Ultimo tiempo de motor */
 extern float revolucionB_time;
@@ -74,7 +73,8 @@ extern float distancia_objetivo;
 
 
 /* ----VARIABLES SEGUIMIENTO LINEA---- */
-extern bool atrasIR_value[6];
+extern bool adelanteIR_value[6];
+extern bool atrasIR_value[2];
 extern float error_linea;
 extern float error_integral_linea;
 extern float correccion_linea;
@@ -86,6 +86,7 @@ extern float last_time_linea;
 /* ----VARIABLES ESTADO---- */
 enum estado_global{inicio = 0, operacion = 1, alcanzar_angulo = 2, avanzar=3, seguir_linea = 4, calcular_nodo = 5};
 extern int state;
+extern bool iniciando_robot;
 extern bool nueva_ruta;
 extern bool nuevo_nodo;
 extern bool angulo_alcanzado;
@@ -103,8 +104,8 @@ extern float nodo_siguiente_distancias[9];
 extern String nodo_siguiente_id;
 extern float distancia_minima;
 
-/*enum estado_global{inicio = 0, operacion = 1, ver_temperatura = 2, ver_humedad = 3, tomar_gps = 4, guardar_datos = 5, control = 6, error = 7};
-extern float sp_temperatura;
-extern bool control_automatico;*/
+/* ----VARIABLES WIFI---- */
+extern const char* ssid;
+extern const char* password;
 
 #endif

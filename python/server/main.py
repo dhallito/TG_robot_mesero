@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, flash
+from flask import Flask, redirect, url_for, render_template, request, flash, jsonify
 from datetime import datetime
 from flask_mysqldb import MySQL
 import json
@@ -84,8 +84,9 @@ def mi_orden(mesa=None):
     mesa_value = f"'{mesa}'"
     if request.method == 'POST':
         cursor = mysql.connection.cursor()
-        cursor.execute(f"UPDATE pedidos SET estado = 'TERMINADO' WHERE mesa = {mesa_value}")
+        cursor.execute(f"UPDATE pedidos SET estado = 'TERMINADO' WHERE mesa = {mesa_value} && estado = 'EN CAMINO'")
         cursor.connection.commit()
+        cursor.close()
         return redirect(url_for('index'))
     cursor = mysql.connection.cursor()
     cursor.execute(f"SELECT estado, orden FROM pedidos WHERE estado != 'TERMINADO' && mesa = {mesa_value}")
@@ -100,6 +101,76 @@ def mi_orden(mesa=None):
 @app.route('/contacto')
 def contacto():
     return render_template('contacto.html')
+
+@app.route('/obtener_orden/<mesa>', methods=['GET'])
+def obtener_orden(mesa=None):
+    pedidos_list = []
+    if mesa == None:
+        return jsonify({'pedidos':None})
+    mesa_value = f"'{mesa}'"
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"SELECT estado, orden FROM pedidos WHERE estado != 'TERMINADO' && mesa = {mesa_value}")
+    pedidos = cursor.fetchall()
+    cursor.close()    
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"UPDATE pedidos SET estado = 'RECIBIDO' WHERE mesa = {mesa_value} && estado = 'ENVIADO'")
+    cursor.connection.commit()
+    cursor.close()
+    for pedido in pedidos:
+        pedidos_list.append(pedido[1])
+    return jsonify({'pedidos':pedidos_list})
+
+@app.route('/obtener_estado', methods=['GET'])
+def obtener_estado():
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"SELECT estado FROM pedidos WHERE estado != 'TERMINADO' && mesa = 'D'")
+    pedidos = cursor.fetchall()
+    if len(pedidos) > 0: estado_D = pedidos[0][0] 
+    else: estado_D = 'TERMINADO'    
+
+    cursor.execute(f"SELECT estado FROM pedidos WHERE estado != 'TERMINADO' && mesa = 'E'")
+    pedidos = cursor.fetchall()
+    if len(pedidos) > 0: estado_E = pedidos[0][0] 
+    else: estado_E = 'TERMINADO' 
+
+    cursor.execute(f"SELECT estado FROM pedidos WHERE estado != 'TERMINADO' && mesa = 'F'")
+    pedidos = cursor.fetchall()
+    if len(pedidos) > 0: estado_F = pedidos[0][0] 
+    else: estado_F = 'TERMINADO' 
+
+    cursor.execute(f"SELECT estado FROM pedidos WHERE estado != 'TERMINADO' && mesa = 'G'")
+    pedidos = cursor.fetchall()
+    if len(pedidos) > 0: estado_G = pedidos[0][0] 
+    else: estado_G = 'TERMINADO' 
+
+    cursor.execute(f"SELECT estado FROM pedidos WHERE estado != 'TERMINADO' && mesa = 'H'")
+    pedidos = cursor.fetchall()
+    if len(pedidos) > 0: estado_H = pedidos[0][0] 
+    else: estado_H = 'TERMINADO' 
+    cursor.close()    
+    return jsonify({'D':estado_D,'E':estado_E,'F':estado_F,'G':estado_G,'H':estado_H})
+
+@app.route('/cocinar_orden/<mesa>', methods=['GET'])
+def cocinar_orden(mesa=None):
+    if mesa == None:
+        return jsonify({'resultado':'error'})
+    mesa_value = f"'{mesa}'"
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"UPDATE pedidos SET estado = 'EN COCINA' WHERE mesa = {mesa_value} && estado = 'RECIBIDO'")
+    cursor.connection.commit()
+    cursor.close()
+    return jsonify({'resultado':'okey'})
+
+@app.route('/montar_orden/<mesa>', methods=['GET'])
+def montar_orden(mesa=None):
+    if mesa == None:
+        return jsonify({'resultado':'error'})
+    mesa_value = f"'{mesa}'"
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"UPDATE pedidos SET estado = 'EN CAMINO' WHERE mesa = {mesa_value} && estado = 'EN COCINA'")
+    cursor.connection.commit()
+    cursor.close()
+    return jsonify({'resultado':'okey'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

@@ -15,8 +15,8 @@ extern int encoderB = 26;
 
 /* Pines IR */
 //extern int atrasIR_pin[6] = {16, 17, 35, 34, 39, 36};
-extern int atrasIR_pin[6] = {36, 39, 34, 35, 17, 16};
-extern int adelanteIR_pin[2] = {4, 0};
+extern int adelanteIR_pin[6] = {36, 39, 34, 35, 17, 16};
+extern int atrasIR_pin[2] = {4, 0};
 
 /* Pines Ultrasonido */
 extern int outputUS_pin = 15;
@@ -71,11 +71,12 @@ extern float distancia_relativa = 0;
 extern float distancia_objetivo = 0.25;
 
 /* ----VARIABLES SEGUIMIENTO LINEA---- */
-extern bool atrasIR_value[6] = {LOW, LOW, LOW, LOW, LOW, LOW};
+extern bool adelanteIR_value[6] = {LOW, LOW, LOW, LOW, LOW, LOW};
+extern bool atrasIR_value[2] = {LOW, LOW};
 extern float error_linea = 0;
 extern float error_integral_linea = 0;
 extern float correccion_linea = 0;
-extern float ki_linea = 0.001;
+extern float ki_linea = 0.005;
 extern float kp_linea = 2;
 extern float velocidad_base = 30;
 extern float last_time_linea = 0;
@@ -83,6 +84,7 @@ extern float distancia_minima = 0;
 
 /* Variables de Estado */
 extern int state=inicio;
+extern bool iniciando_robot = false;
 extern bool nueva_ruta = false;
 extern bool nuevo_nodo = false;
 extern bool angulo_alcanzado = false;
@@ -99,5 +101,6 @@ extern float nodo_siguiente_angulos[9] = {100, 100, 100, 100, 100, 100, 100, 100
 extern float nodo_siguiente_distancias[9] = {100, 100, 100, 100, 100, 100, 100, 100, 100};
 extern String nodo_siguiente_id = "";
 
-/*extern float sp_temperatura = 0.0;
-extern bool control_automatico = false;*/
+/* ----VARIABLES WIFI---- */
+extern const char* ssid = "David_TG";
+extern const char* password =  "david_tg";
